@@ -5,9 +5,15 @@ export connect from './connect';
 
 const subscribers = new Set();
 
+function getSingleKey(store, key) {
+  if (!store) return null;
+  // TODO: fix hack for Immutable
+  return store.get ? store.get(key) : store[key];
+}
+
 function getKey(store, key) {
   if (key === '') return store;
-  return key.split('.').reduce((data, bit) => data[bit], store);
+  return key.split('.').reduce((data, bit) => getSingleKey(data, bit), store);
 }
 
 let request;
@@ -17,8 +23,16 @@ function notify(state, prevStore) {
   subscribers.forEach((subscriber) => {
     let keys = Array.from(subscriber.keys);
     if (keys.some((key) => getKey(state.store, key) !== getKey(prevStore, key))) {
-      subscriber.needsUpdate = true;
-      subscriber.setState({});
+      if (typeof subscriber === 'function') {
+        subscriber(getKey(state.store, keys[0]));
+      } else {
+        console.log('needs update', keys, subscriber.constructor.displayName);
+        // Workaround for React issue #3620
+        if (typeof document !== 'undefined') {
+          subscriber.needsUpdate = true;
+          subscriber.forceUpdate();
+        }
+      }
     }
   });
 }
@@ -37,7 +51,9 @@ export function bindActions(actions, state) {
   Object.keys(actions).forEach(function(k) {
     const action = actions[k];
     boundActions[k] = function(...args) {
-      update(state, action(state.store, boundActions, ...args));
+      const newStore = action(state.store, boundActions, ...args);
+      update(state, newStore);
+      return newStore;
     };
   });
   return boundActions;
@@ -45,11 +61,13 @@ export function bindActions(actions, state) {
 
 export function createStore(store={}, actions={}) {
   const state = {store};
-  function get(el, key) {
-    if (el === undefined) throw new Error('First argument of get() should be the caller component');
-    el.keys || (el.keys = new Set());
-    el.keys.add(key);
-    subscribers.add(el);
+  function get(key, listener) {
+    if (listener === undefined) throw new Error('First argument of get() should be a listener component or function');
+    if (key !== '') {
+      listener.keys || (listener.keys = new Set());
+      listener.keys.add(key);
+      subscribers.add(listener);
+    }
     return getKey(state.store, key);
   };
   return {get, actions: bindActions(actions, state)};

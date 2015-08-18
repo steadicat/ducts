@@ -4,7 +4,7 @@ const DEBUG = false;
 
 export default function connect(Component) {
   return class Connect extends React.Component {
-    static displayName = 'Connect';
+    static displayName = `Connect(${Component.displayName})`;
 
     static contextTypes = {
       actions: React.PropTypes.objectOf(
@@ -18,12 +18,12 @@ export default function connect(Component) {
         this.needsUpdate = false;
         return true;
       }
-      return !propsEqual(this.props, nextProps, this.displayName);
+      return !propsEqual(this.props, nextProps, this.constructor.displayName);
     }
 
     render() {
       const {actions, get} = this.context;
-      return <Component {...this.props} get={get.bind(null, this)} actions={actions} />;
+      return <Component {...this.props} get={(key) => get(key, this)} actions={actions} />;
     }
   }
 }
