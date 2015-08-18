@@ -26,7 +26,6 @@ function notify(state, prevStore) {
       if (typeof subscriber === 'function') {
         subscriber(getKey(state.store, keys[0]));
       } else {
-        console.log('needs update', keys, subscriber.constructor.displayName);
         // Workaround for React issue #3620
         if (typeof document !== 'undefined') {
           subscriber.needsUpdate = true;
