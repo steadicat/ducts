@@ -8,7 +8,7 @@ Ducts borrows the best ideas from Redux, but reduces boilerplate even further by
 
 - **Store getter with autosubscribe**: components don't need to do anything to subscribe to the stores other than read from it inside of `render()`. Reads are done using a single `get` function which takes a path as its only argument. E.g. `get('users.123.fullName')`.
 - **Selective rerender**: when the data changes, only the components affected rerender.
-- **requestAnimationFrame Batching**: all store updates are batched together and executed in the next frame for extra performance.
+- **requestAnimationFrame batching**: all store updates are batched together and executed in the next frame for extra performance.
 - **Easy async**: actions can perform async operations and call other actions when they're done.
 - **Universal/isomorphic**: just like with Redux, there is no global state. Server-side isolation, server-side rendering and client-side rendering with server-sent data are easy.
 
