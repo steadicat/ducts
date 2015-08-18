@@ -21,7 +21,14 @@
   "keywords": [
     "react",
     "flux",
-    "redux"
+    "redux",
+    "async",
+    "actions",
+    "stores",
+    "data",
+    "functional",
+    "isomorphic",
+    "universal"
   ],
   "dependencies": {
     "raf": "3.1.0",
