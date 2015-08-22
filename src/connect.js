@@ -21,6 +21,10 @@ export default function connect(Component) {
       return !propsEqual(this.props, nextProps, this.constructor.displayName);
     }
 
+    componentWillUnmount() {
+      this.context.get.unsubscribe(this);
+    }
+
     render() {
       const {actions, get} = this.context;
       return <Component {...this.props} get={(key) => get(key, this)} actions={actions} />;

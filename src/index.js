@@ -21,8 +21,9 @@ let request;
 function notify(state, prevStore) {
   request = null;
   subscribers.forEach((subscriber) => {
-    let keys = Array.from(subscriber.keys);
-    if (keys.some((key) => getKey(state.store, key) !== getKey(prevStore, key))) {
+    const keys = Array.from(subscriber.__keys);
+    if (keys.some(key =>
+      getKey(state.store, key) !== getKey(prevStore, key))) {
       if (typeof subscriber === 'function') {
         subscriber(getKey(state.store, keys[0]));
       } else {
@@ -40,7 +41,9 @@ function update(state, data) {
   if (!data) console.warn('Some action forgot to return the new store!');
   const prevStore = state.store;
   state.store = data;
-  if (!request) {
+  if (typeof window === 'undefined') {
+    notify(state, prevStore);
+  } else if (!request) {
     request = raf(notify.bind(null, state, prevStore));
   }
 }
@@ -60,13 +63,19 @@ export function bindActions(actions, state) {
 
 export function createStore(store={}, actions={}) {
   const state = {store};
+
   function get(key, listener) {
     if (key !== '' && listener) {
-      listener.keys || (listener.keys = new Set());
-      listener.keys.add(key);
+      listener.__keys || (listener.__keys = new Set());
+      listener.__keys.add(key);
       subscribers.add(listener);
     }
     return getKey(state.store, key);
+  }
+
+  get.unsubscribe = (listener) => {
+    subscribers.delete(listener);
   };
+
   return {get, actions: bindActions(actions, state)};
 }
