@@ -51,6 +51,9 @@ export function bindActions(actions, state) {
     const action = actions[k];
     boundActions[k] = function(...args) {
       const newStore = action(state.store, boundActions, ...args);
+      if (!newStore) {
+        return state.store;
+      }
       update(state, newStore);
       return newStore;
     };
