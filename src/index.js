@@ -61,8 +61,7 @@ export function bindActions(actions, state) {
 export function createStore(store={}, actions={}) {
   const state = {store};
   function get(key, listener) {
-    if (listener === undefined) throw new Error('First argument of get() should be a listener component or function');
-    if (key !== '') {
+    if (key !== '' && listener) {
       listener.keys || (listener.keys = new Set());
       listener.keys.add(key);
       subscribers.add(listener);
