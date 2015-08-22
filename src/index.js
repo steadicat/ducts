@@ -76,7 +76,7 @@ export function bindActions(actions, state) {
 
       actionCalledOtherActions = syncActionCallDepth > 0;
 
-      return newStore;
+      return newStore !== undefined ? newStore : store;
     };
   });
   return boundActions;
