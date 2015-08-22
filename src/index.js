@@ -38,7 +38,6 @@ function notify(state, prevStore) {
 }
 
 function update(state, data) {
-  if (!data) console.warn('Some action forgot to return the new store!');
   const prevStore = state.store;
   state.store = data;
   if (typeof window === 'undefined') {
@@ -48,13 +47,35 @@ function update(state, data) {
   }
 }
 
+let syncActionCallDepth = 0;
+let actionCalledOtherActions = false;
+
 export function bindActions(actions, state) {
   const boundActions = {};
   Object.keys(actions).forEach(function(k) {
     const action = actions[k];
     boundActions[k] = function(...args) {
+      if (syncActionCallDepth) {
+        console.warn(`Action ${k} was called by another action synchronously. Be careful as this action’s changes, if ignored, might be overridden by the return value of the parent action.`);
+      }
+
+      syncActionCallDepth++;
       const newStore = action(state.store, boundActions, ...args);
-      update(state, newStore);
+      syncActionCallDepth--;
+
+      if (actionCalledOtherActions && newStore) {
+        console.warn(`Action ${k} called another action synchronously and also returned a new store. This behavior is deprecated and might be removed in the future.`);
+        update(state, newStore);
+      } else if (actionCalledOtherActions) {
+        // No-op!
+      } else if (!newStore) {
+        console.warn(`Action ${k} forgot to return the new store!`);
+      } else {
+        update(state, newStore);
+      }
+
+      actionCalledOtherActions = syncActionCallDepth > 0;
+
       return newStore;
     };
   });
