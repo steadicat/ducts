@@ -108,7 +108,7 @@ React.renderToString(root);
 /* On the client */
 
 // Recreate the store using all the data from the server-side store
-// (use `get('')` and inline it in your page as JSON).
+// (use `get()` and inline it in your page as JSON).
 const {get, actions} = createStore(serverSentData, actions);
 
 // Optional: client-only initialization

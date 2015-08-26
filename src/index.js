@@ -5,15 +5,17 @@ export connect from './connect';
 
 const subscribers = new Set();
 
-function getSingleKey(store, key) {
+function getSingleKey(store, key, defaultValue) {
   if (!store) return null;
   // TODO: fix hack for Immutable
-  return store.get ? store.get(key) : store[key];
+  const val = store.get ? store.get(key) : store[key];
+  return val !== undefined ? val : defaultValue;
 }
 
-function getKey(store, key) {
-  if (key === '') return store;
-  return key.split('.').reduce((data, bit) => getSingleKey(data, bit), store);
+function getKey(store, key, defaultValue) {
+  if (!key || key === '') return store;
+  const val = key.split('.').reduce((data, bit) => getSingleKey(data, bit), store);
+  return val !== undefined ? val : defaultValue;
 }
 
 let request;
@@ -85,13 +87,17 @@ export function bindActions(actions, state) {
 export function createStore(store={}, actions={}) {
   const state = {store};
 
-  function get(key, listener) {
-    if (key !== '' && listener) {
+  function get(key, defaultValue, listener) {
+    if (!listener && typeof defaultValue === 'function') {
+      listener = defaultValue;
+      defaultValue = undefined;
+    }
+    if (key && key !== '' && listener) {
       listener.__keys || (listener.__keys = new Set());
       listener.__keys.add(key);
       subscribers.add(listener);
     }
-    return getKey(state.store, key);
+    return getKey(state.store, key, defaultValue);
   }
 
   get.unsubscribe = (listener) => {

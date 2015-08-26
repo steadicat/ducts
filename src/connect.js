@@ -11,13 +11,24 @@ export default function connect(Component) {
       get: React.PropTypes.func,
     }
 
+    componentWillMount() {
+      const {get} = this.context;
+      this.get = (key, defaultValue) =>
+        get(key, defaultValue, this);
+    }
+
     componentWillUnmount() {
       this.context.get.unsubscribe(this);
     }
 
     render() {
-      const {actions, get} = this.context;
-      return <Component {...this.props} get={(key) => get(key, this)} actions={actions} />;
+      return (
+        <Component
+          {...this.props}
+          get={this.get}
+          actions={this.context.actions}
+        />
+      );
     }
   }
 }
