@@ -23,8 +23,8 @@ function init(store={}, actions) {
   return {counter: 0};
 }
 
-function incrementCounter(store, actions) {
-  return {...store, {counter: store.counter + 1}};
+function incrementCounter(get, actions) {
+  return {...get(), {counter: get('counter') + 1}};
 }
 
 /* Components */
@@ -69,15 +69,22 @@ React.renderToString(root);
 Actions have access to all other actions. They can call them whenever they feel like, even asynchronously. For example:
 
 ```js
-function loadRequested(store, actions, id) {
+function loadRequested(get, actions, id) {
   api.fetch(id, actions.loadDone);
-  return {...store, {loading: true}};
+  return {...get(), {loading: true}};
 }
 
-function loadDone(store, actions, result) {
-  return {...store, {loading: false, result}};
+function loadDone(get, actions, result) {
+  return {...get(), {loading: false, result}};
 }
 ```
+
+The only pitfall with async actions is storing the result of a `get()` call in a local variable before calling other actions synchronously. The locally stored data can potentially override any changes that were done to the store by the other actions.
+
+To avoid this, either:
+
+ - Make sure to always read the latest value of the store with `get()` before making any changes to it.
+ - Make sure any calls to actions that modify the store are asynchronous. You can use `setTimeout(actions.mySynchronousAction, 0)` if necessary.
 
 ## Isomorphic/universal apps
 

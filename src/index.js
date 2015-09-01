@@ -49,34 +49,26 @@ function update(state, data) {
   }
 }
 
-let syncActionCallDepth = 0;
-let actionCalledOtherActions = false;
+const syncActionsStack = [];
 
 export function bindActions(actions, state) {
   const boundActions = {};
   Object.keys(actions).forEach(function(k) {
     const action = actions[k];
     boundActions[k] = function(...args) {
-      if (syncActionCallDepth) {
-        console.warn(`Action ${k} was called by another action synchronously. Be careful as this action’s changes, if ignored, might be overridden by the return value of the parent action.`);
+      if (process.env.NODE_ENV !== 'production') {
+        syncActionsStack.length && console.warn(`Action ${k} was called by ${syncActionsStack[0]} synchronously. Make sure no results of get() were stored in local variables before the call.`);
       }
 
-      syncActionCallDepth++;
-      const newStore = action(state.store, boundActions, ...args);
-      syncActionCallDepth--;
+      syncActionsStack.unshift(k);
+      const newStore = action(state.get, boundActions, ...args);
+      syncActionsStack.shift();
 
-      if (actionCalledOtherActions && newStore) {
-        console.warn(`Action ${k} called another action synchronously and also returned a new store. This behavior is deprecated and might be removed in the future.`);
-        update(state, newStore);
-      } else if (actionCalledOtherActions) {
-        // No-op!
-      } else if (!newStore) {
-        console.warn(`Action ${k} forgot to return the new store!`);
+      if (!newStore) {
+        // No-op
       } else {
         update(state, newStore);
       }
-
-      actionCalledOtherActions = syncActionCallDepth > 0;
 
       return newStore !== undefined ? newStore : state.store;
     };
@@ -103,6 +95,8 @@ export function createStore(store={}, actions={}) {
   get.unsubscribe = (listener) => {
     subscribers.delete(listener);
   };
+
+  state.get = get;
 
   return {get, actions: bindActions(actions, state)};
 }
