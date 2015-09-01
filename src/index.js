@@ -56,10 +56,6 @@ export function bindActions(actions, state) {
   Object.keys(actions).forEach(function(k) {
     const action = actions[k];
     boundActions[k] = function(...args) {
-      if (process.env.NODE_ENV !== 'production') {
-        syncActionsStack.length && console.warn(`Action ${k} was called by ${syncActionsStack[0]} synchronously. Make sure no results of get() were stored in local variables before the call.`);
-      }
-
       syncActionsStack.unshift(k);
       const newStore = action(state.get, boundActions, ...args);
       syncActionsStack.shift();
@@ -67,6 +63,9 @@ export function bindActions(actions, state) {
       if (!newStore) {
         // No-op
       } else {
+        if (process.env.NODE_ENV !== 'production') {
+          syncActionsStack.length && console.warn(`Action ${k} was called by ${syncActionsStack[0]} synchronously and also returned a new store. Make sure no results of get() were stored in local variables before the call.`);
+        }
         update(state, newStore);
       }
 
