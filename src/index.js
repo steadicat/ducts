@@ -64,7 +64,7 @@ export function bindActions(actions, state) {
         // No-op
       } else {
         if (process.env.NODE_ENV !== 'production') {
-          syncActionsStack.length && console.warn(`Action ${k} was called by ${syncActionsStack[0]} synchronously and also returned a new store. Make sure no results of get() were stored in local variables before the call.`);
+          syncActionsStack.length && console.warn(`Action ${syncActionsStack[0]} called ${k} synchronously, and ${k} modified the store. Make sure there are no local variables storing stale results of get() calls before the call to ${k}.`);
         }
         update(state, newStore);
       }
