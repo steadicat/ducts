@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class Root {
+export default class Root extends React.Component {
   displayName = 'Root';
 
   static childContextTypes = {
