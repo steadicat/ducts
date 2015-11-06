@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function connect(Component) {
   return class Connect extends React.Component {
-    static displayName = `Connect(${Component.displayName})`;
+    static displayName = 'Connect';
 
     static contextTypes = {
       actions: React.PropTypes.objectOf(
