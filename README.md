@@ -51,10 +51,10 @@ const actions = {init, incrementCounter};
 
 // A store is just a piece of data. createStore simply
 // gives you functions to read from it and write to it.
-const {get, actions} = createStore(initialData);
+const {get, actions: boundActions} = createStore(initialData, actions);
 
 const root =
-  <Root get={get} actions={actions}>
+  <Root get={get} actions={boundActions}>
     {() => <MyApp />}
   </Root>;
 
