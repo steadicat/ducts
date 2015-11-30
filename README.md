@@ -53,9 +53,10 @@ const actions = {init, incrementCounter};
 // gives you functions to read from it and write to it.
 const {get, actions: boundActions} = createStore(initialData, actions);
 
+// Root makes get and actions available to any @connect-ed components below it
 const root =
   <Root get={get} actions={boundActions}>
-    {() => <MyApp />}
+    <MyApp />
   </Root>;
 
 React.render(root, document);
@@ -106,7 +107,7 @@ actions.init();
 
 const root =
   <Root get={get} actions={actions}>
-    {() => <MyApp />}
+    <MyApp />
   </Root>;
 
 React.renderToString(root);
@@ -123,7 +124,7 @@ actions.initClient();
 
 const root =
   <Root get={get} actions={actions}>
-    {() => <MyApp />}
+    <MyApp />
   </Root>;
 
 React.render(root, document);
