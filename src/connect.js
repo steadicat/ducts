@@ -21,6 +21,23 @@ export default function connect(Component) {
       this.context.get.unsubscribe(this);
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+      if (!Component.pure) return true;
+      for (let k in this.props) {
+        if (this.props[k] !== nextProps[k]) return true;
+      }
+      for (let k in nextProps) {
+        if (this.props[k] !== nextProps[k]) return true;
+      }
+      for (let k in this.state) {
+        if (this.state[k] !== nextState[k]) return true;
+      }
+      for (let k in nextState) {
+        if (this.state[k] !== nextState[k]) return true;
+      }
+      return this.needsUpdate || false;
+    }
+
     render() {
       return (
         <Component
