@@ -9,7 +9,7 @@ export default function connect(Component) {
         React.PropTypes.func,
       ),
       get: React.PropTypes.func,
-    }
+    };
 
     componentWillMount() {
       const {get} = this.context;

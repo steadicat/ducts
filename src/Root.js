@@ -8,7 +8,7 @@ export default class Root extends React.Component {
       React.PropTypes.func,
     ),
     get: React.PropTypes.func,
-  }
+  };
 
   getChildContext() {
     const {get, actions} = this.props;
