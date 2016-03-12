@@ -56,15 +56,25 @@ export function bindActions(actions, state) {
   Object.keys(actions).forEach(function(k) {
     const action = actions[k];
     boundActions[k] = function(...args) {
-      syncActionsStack.unshift(k);
-      const newStore = action(state.get, boundActions, ...args);
-      syncActionsStack.shift();
 
-      if (!newStore) {
-        // No-op
-      } else {
+      if (process.env.NODE_ENV !== 'production') {
+        syncActionsStack.unshift({caller: k, callees: []});
+      }
+
+      const newStore = action(state.get, boundActions, ...args);
+
+      if (process.env.NODE_ENV !== 'production') {
+        const call = syncActionsStack.shift();
+        if (newStore && call.callees.length) {
+          console.warn(`Action ${call.caller} called ${call.callees.join(', ')} synchronously, which modified the store, then modified the store itself, potentially overriding the changes. Try to split up actions that call other actions and actions that modify the store.`);
+        }
+      }
+
+      if (newStore) {
         if (process.env.NODE_ENV !== 'production') {
-          syncActionsStack.length && console.warn(`Action ${syncActionsStack[0]} called ${k} synchronously, and ${k} modified the store. Make sure there are no local variables storing stale results of get() calls before the call to ${k}.`);
+          if (syncActionsStack.length) {
+            syncActionsStack[syncActionsStack.length - 1].callees.push(k);
+          }
         }
         update(state, newStore);
       }
