@@ -3,8 +3,8 @@
   "version": "0.4.0",
   "description": "A Flux implementation that's even more minimal than Redux.",
   "author": "Stefano J. Attardi (http://github.com/steadicat)",
-  "main": "lib/index.js",
-  "jsnext:main": "src/index.es6.js",
+  "main": "index.js",
+  "jsnext:main": "index.es6.js",
   "scripts": {
     "lint": "./node_modules/.bin/eslint src",
     "build": "./node_modules/.bin/rollup -c -f umd -o index.js && ./node_modules/.bin/rollup -c -f es6 -o index.es6.js",
