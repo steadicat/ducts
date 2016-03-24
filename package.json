@@ -1,6 +1,6 @@
 {
   "name": "ducts",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "A Flux implementation that's even more minimal than Redux.",
   "author": "Stefano J. Attardi (http://github.com/steadicat)",
   "main": "lib/index.js",
