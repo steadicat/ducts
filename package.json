@@ -4,10 +4,10 @@
   "description": "A Flux implementation that's even more minimal than Redux.",
   "author": "Stefano J. Attardi (http://github.com/steadicat)",
   "main": "lib/index.js",
-  "jsnext:main": "src/index.js",
+  "jsnext:main": "src/index.es6.js",
   "scripts": {
-    "lint": "eslint src",
-    "build": "./node_modules/.bin/babel src --out-dir lib",
+    "lint": "./node_modules/.bin/eslint src",
+    "build": "./node_modules/.bin/rollup -c -f umd -o index.js && ./node_modules/.bin/rollup -c -f es6 -o index.es6.js",
     "prepublish": "npm run build"
   },
   "homepage": "https://github.com/steadicat/ducts",
@@ -31,15 +31,21 @@
     "universal"
   ],
   "dependencies": {
-    "raf": "3.1.x",
     "react": "0.14.x"
   },
   "devDependencies": {
-    "babel-cli": "6.4.x",
-    "babel-plugin-transform-runtime": "6.5.x",
-    "babel-preset-es2015": "6.3.x",
-    "babel-preset-react": "6.3.x",
-    "babel-preset-stage-0": "6.3.x"
+    "babel-eslint": ">6.0.0-beta",
+    "babel-preset-es2015-rollup": "1.1.x",
+    "babel-preset-react": "6.5.x",
+    "babel-preset-stage-0": "6.5.x",
+    "eslint": "2.4.x",
+    "eslint-plugin-babel": "^3.1.0",
+    "eslint-plugin-react": "4.2.x",
+    "raf": "3.2.x",
+    "rollup": "0.25.x",
+    "rollup-plugin-babel": "2.4.x",
+    "rollup-plugin-commonjs": "2.2.x",
+    "rollup-plugin-node-resolve": "1.5.x"
   },
   "license": "MIT"
 }
