@@ -22,7 +22,7 @@ export default function connect(Component) {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-      if (!Component.pure) return true;
+      if ((Component instanceof React.Component) && !Component.pure && !Component.pureRender) return true;
       for (let k in this.props) {
         if (this.props[k] !== nextProps[k]) return true;
       }

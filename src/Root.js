@@ -1,7 +1,6 @@
 import React from 'react';
 
 export default class Root extends React.Component {
-  displayName = 'Root';
 
   static childContextTypes = {
     actions: React.PropTypes.objectOf(

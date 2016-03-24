@@ -9,31 +9,29 @@ function getSingleKey(store, key, defaultValue) {
   if (!store) return null;
   // TODO: fix hack for Immutable
   const val = store.get ? store.get(key) : store[key];
-  return val !== undefined ? val : defaultValue;
+  return (val !== undefined && val !== null) ? val : defaultValue;
 }
 
 function getKey(store, key, defaultValue) {
   if (!key || key === '') return store;
   const val = key.split('.').reduce((data, bit) => getSingleKey(data, bit), store);
-  return val !== undefined ? val : defaultValue;
+  return (val !== undefined && val !== null) ? val : defaultValue;
 }
 
 let request;
 
 function notify(state, prevStore) {
   request = null;
-  subscribers.forEach((subscriber) => {
+  subscribers.forEach(subscriber => {
     const keys = Array.from(subscriber.__keys);
     if (keys.some(key =>
       getKey(state.store, key) !== getKey(prevStore, key))) {
       if (typeof subscriber === 'function') {
         subscriber(getKey(state.store, keys[0]));
-      } else {
+      } else if (typeof document !== 'undefined') {
         // Workaround for React issue #3620
-        if (typeof document !== 'undefined') {
-          subscriber.needsUpdate = true;
-          subscriber.forceUpdate();
-        }
+        subscriber.needsUpdate = true;
+        subscriber.forceUpdate();
       }
     }
   });
@@ -85,7 +83,7 @@ export function bindActions(actions, state) {
   return boundActions;
 }
 
-export function createStore(store={}, actions={}) {
+export function createStore(store = {}, actions = {}) {
   const state = {store};
 
   function get(key, defaultValue, listener) {
@@ -101,7 +99,7 @@ export function createStore(store={}, actions={}) {
     return getKey(state.store, key, defaultValue);
   }
 
-  get.unsubscribe = (listener) => {
+  get.unsubscribe = listener => {
     subscribers.delete(listener);
   };
 
