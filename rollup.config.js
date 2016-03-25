@@ -5,9 +5,6 @@ import commonjs from 'rollup-plugin-commonjs';
 export default {
   entry: 'src/index.js',
   moduleName: 'rollup',
-  globals: {
-    'react': 'React',
-  },
   plugins: [
     babel({
       presets: ['es2015-rollup', 'react', 'stage-0'],

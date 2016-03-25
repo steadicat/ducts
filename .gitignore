@@ -1,3 +1,2 @@
-lib
-/index.es6.js
-/index.js
+index.es2015.js
+index.js
