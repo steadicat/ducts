@@ -1,7 +1,14 @@
 /* global console */
 import raf from 'raf';
+import ReactDOM from 'react-dom';
 export Root from './Root';
-export connect from './connect';
+export {default as connect, enableRenderLogging} from './connect';
+
+let DEBUG = false;
+
+export function enableActionsLogging(enabled = true) {
+  DEBUG = enabled;
+}
 
 const subscribers = new Set();
 
@@ -43,7 +50,15 @@ function update(state, data) {
   if (typeof window === 'undefined') {
     notify(state, prevStore);
   } else if (!request) {
-    request = raf(notify.bind(null, state, prevStore));
+    request = raf(() => {
+      if (ReactDOM.unstable_batchedUpdates) {
+        ReactDOM.unstable_batchedUpdates(() => {
+          notify(state, prevStore);
+        });
+      } else {
+        notify(state, prevStore);
+      }
+    });
   }
 }
 
@@ -57,6 +72,7 @@ export function bindActions(actions, state) {
 
       if (process.env.NODE_ENV !== 'production') {
         syncActionsStack.unshift({caller: k, callees: []});
+        DEBUG && console.info(`Action ${k}`, ...args);
       }
 
       const newStore = action(state.get, boundActions, ...args);
