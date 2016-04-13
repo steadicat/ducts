@@ -49,11 +49,11 @@ export default function connect(Component) {
 
     log = process.env.NODE_ENV === 'production' ?
       (x => x) :
-      ((x, reason) => {
-        if (DEBUG) {
+      ((shouldRender, reason) => {
+        if (DEBUG && shouldRender) {
           console.info(`${displayName} rerendered because ${reason}.`);
         }
-        return x;
+        return shouldRender;
       });
 
     render() {
