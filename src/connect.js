@@ -21,8 +21,8 @@ export default function connect(Component) {
 
     componentWillMount() {
       const {get} = this.context;
-      this.get = (key, defaultValue) =>
-        get(key, defaultValue, this);
+      this.get = (key, defaultValue, subscriber = this) =>
+        get(key, defaultValue, subscriber);
     }
 
     componentWillUnmount() {
